@@ -1,3 +1,62 @@
+
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.next = None
+
+class LL:
+    def __init__(self):
+        #keep track of head
+        self.head = None
+
+    def __str__(self):
+        r = ""
+        cur = self.head
+
+        while cur is not None:
+            r += f'({cur.value})'
+            if cur.next is not None:
+                r += ' -> '
+
+            cur = cur.next
+
+        return r
+
+    def insert_at_head(self, node):
+        node.next = self.head
+        self.head = node
+    
+    def find(self, value):
+        current = self.head #keep copy of head
+        while current is not None: #traverse LL
+            if current.value == value:
+                return current
+            current = current.next
+        return None #not in the LL
+
+    def delete(self, value):
+        current = self.head
+        #if I'm deleting the head
+        if current.value == value:
+            self.head = self.head.next
+            return current
+        
+        #it's not the head
+        #traverse LL with both pointers
+        prev = current
+        current = current.next
+        
+        while current is not None:
+            if current.value == value:
+                prev.next = current.next
+                return current
+            else:   
+                prev = prev.next
+                current = current.next
+
+        return None
+        
 class HashTableEntry:
     """
     Linked List hash table key/value pair
@@ -6,6 +65,12 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+        self.head = None
+
+
+    def __repr__(self):
+        return f'HashTableEntry({repr(self.key)},{repr(self.value)})'
+
 
 
 # Hash table can't have fewer than this many slots
@@ -22,7 +87,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.capacity = MIN_CAPACITY
+        self.data = [None] * self.capacity
+        self.load = 0
 
     def get_num_slots(self):
         """
@@ -35,6 +102,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.data) # or just self.capacity
 
 
     def get_load_factor(self):
@@ -43,6 +111,8 @@ class HashTable:
 
         Implement this.
         """
+        load_factor = self.load / len(self.data)
+        return load_factor
         # Your code here
 
 
@@ -63,6 +133,14 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+        hash = 5381
+        byte_array = key.encode('utf-8')
+
+        for byte in byte_array:
+        # the modulus keeps it 32-bit, python integers don't overflow
+            hash = ((hash * 33) ^ byte) % 0x100000000
+
+        return hash
 
 
     def hash_index(self, key):
@@ -82,7 +160,29 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # get slot
+        slot = self.hash_index(key)
+        # new entry, instantiate HashTableEntry (like a node)  
+        new_entry = HashTableEntry(key, value)
+        # if there's something there in that slot:
+        if self.data[slot]:
+            #append to the head, update pointers
+            #My new entry NEXT pointer points to the "head of slot"/"first position"
+            new_entry.next = self.data[slot]
+            
+            #In that first position put there my new entry, making it the "head" of that slot
+            self.data[slot] = new_entry 
+            self.load += 1
+            """ #append to end
+            self.data[slot].next = new_entry
+            print(" NEXTT!!!", self.data[slot].next) """
+        # if slot is empty put there my new entry
+        else:
+            self.data[slot] = new_entry
+            self.load += 1
+        #if found, update it
+        #if not found, make a new HashTableEntry
+        #and add it to the list
 
     def delete(self, key):
         """
@@ -93,6 +193,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        self.put(key,None)
+        self.load -= 1
 
 
     def get(self, key):
