@@ -206,6 +206,17 @@ class HashTable:
         Implement this.
         """
         # Your code here
+                # this gives me an index within a range
+        slot = self.hash_index(key)
+        current = self.data[slot]
+        
+        # walk the linked list in that slot
+        while current is not None:
+            if current.key == key:
+                
+                return current.value
+            current = current.next
+        return None
 
 
     def resize(self, new_capacity):
@@ -216,6 +227,51 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        """
+        create a copy of old storage
+        update the self.capacity to the new capacity
+        overwrite old storage based of the new self.capacity
+        for each item of the old storage insert in the new storage using the self.put method
+        if it's a LL traverse it and insert with put method
+    
+        """ 
+        """ print("DATA FIRST", self.data) """
+        # Keep track of capacity and load factor
+        if self.get_load_factor() >= 0.7:
+            #copy of old list
+            old_list = self.data
+            #updating storage
+            self.capacity = new_capacity
+            self.data = [None] * self.capacity
+            """ print("THE CAPACITY NOW IS", self.capacity)
+            print("DATA HERe", self.data) """
+            #iterate through range of the list
+            for i in range(len(old_list)): # i 0-7
+                current = old_list[i]
+                
+                while current:
+                    print("CURRENT", current)
+                    new_slot = self.hash_index(current.key)
+                    print("SLOTT", new_slot)
+                    print("!!!!", self.data[new_slot])
+                    if self.data[new_slot] is None:
+                        self.data[new_slot] = (HashTableEntry(current.key, current.value))
+                        print("IFDATA HERe", self.data)
+                        print("!!!!", self.data[new_slot])
+                        current = current.next
+                    
+                    else:
+                        self.data[i].next = self.data[i]
+                        print("ELSEDATA HERe", self.data)
+
+
+            
+
+        else:
+            print("underloaded")
+        # if its overloaded, resize it
+        # By changing the capacity 
+
 
 
 
